@@ -22,7 +22,7 @@ RUN mkdir -p /run/nginx && \
 # Switch to non-root user
 USER appuser
 
-EXPOSE 80
+EXPOSE 15000
 
 # Start both nginx and flask (note: no process supervision)
 CMD ["sh", "-c", "nginx && python app.py"]
