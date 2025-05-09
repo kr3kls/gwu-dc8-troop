@@ -1,11 +1,10 @@
 from flask import Flask, request, jsonify
 import os
-import subprocess
+import ipaddress
+from ping3 import ping, PingError
+from simpleeval import simple_eval, SimpleEval, FunctionNotDefined
 
 app = Flask(__name__)
-
-# Hard-coded password
-PASSWORD = "supersecretpassword"
 
 @app.route('/')
 def hello():
@@ -14,21 +13,45 @@ def hello():
         return jsonify({"error": "Invalid name"}), 400
     return f"Hello, {name}!"
 
-# Command injection vulnerability
 @app.route('/ping')
 def ping():
+    # Get IP address from URL
     ip = request.args.get('ip')
-    # Unsafe command execution
-    result = subprocess.check_output(f"ping -c 1 {ip}", shell=True)
-    return result
+    if not ip:
+        return jsonify({"error": "IP address parameter is required."}), 400
+    
+    # Check IP address format
+    try:
+        ip_address = ipaddress.ipv4address(ip)
+    except ValueError as error:
+        return jsonify({"error": "Invalid IP address format."}), 400
+    
+    # Execute ping command
+    try:
+        delay = ping(str(ip_address), timeout=2)
+        if delay is None:
+            return jsonify({"error": f"No response from {ip_address}"}), 504
+        return jsonify({"ip": str(ip_address), "delay_ms": round(delay * 1000, 2)})
+    except PingError as e:
+        return jsonify({"error": f"Ping failed: {str(e)}"}), 500
 
 # Insecure use of eval
 @app.route('/calculate')
 def calculate():
+    # Get expression from URL
     expression = request.args.get('expr')
-    # Dangerous use of eval
-    result = eval(expression)
-    return str(result)
+    if not expression:
+        return jsonify({"error": "Missing 'expr' parameter."}), 400
+    
+    # Evaluate expression
+    evaluator = SimpleEval()
+    try:
+        result = evaluator.eval(expression)
+        return jsonify({"result": result})
+    except FunctionNotDefined as e:
+        return jsonify({"error": "Function not allowed", "details": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": "Invalid expression", "details": str(e)}), 400
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='127.0.0.1', port=5000)
