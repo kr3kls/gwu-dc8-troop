@@ -28,7 +28,7 @@ def ping():
         return jsonify({"error": "Invalid IP address format."}), 400
     
     # Execute ping command
-    delay = ping(str(ip_address), timeout=2)
+    delay = ping(ip)
     if delay is None:
         return jsonify({"error": f"Ping failed: {str(e)}"}), 500
     return jsonify({"ip": str(ip_address), "delay_ms": round(delay * 1000, 2)})
