@@ -23,7 +23,7 @@ def ping():
     
     # Check IP address format
     try:
-        ip_address = ipaddress.ipv4address(ip)
+        ip_address = ipaddress.IPv4Address(ip)
     except ValueError as error:
         return jsonify({"error": "Invalid IP address format."}), 400
     
