@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
+import ast
 import os
 import ipaddress
 from ping3 import ping
-from simpleeval import simple_eval, SimpleEval, FunctionNotDefined
 
 
 app = Flask(__name__)
@@ -43,14 +43,11 @@ def calculate():
         return jsonify({"error": "Missing 'expr' parameter."}), 400
     
     # Evaluate expression
-    evaluator = SimpleEval()
     try:
-        result = evaluator.eval(expression)
-        return jsonify({"result": result})
-    except FunctionNotDefined as e:
-        return jsonify({"error": "Function not allowed", "details": str(e)}), 400
-    except Exception as e:
-        return jsonify({"error": "Invalid expression", "details": str(e)}), 400
+        result = ast.literal_eval(expression)
+        return str(result)
+    except (ValueError, SyntaxError):
+        return jsonify({"error": "Invalid expression"}), 400
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='127.0.0.1', port=5000)

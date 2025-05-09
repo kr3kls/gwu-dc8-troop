@@ -16,7 +16,7 @@ dbuild: check
 
 # Run the container
 run:
-	docker run -p 127.0.0.1:6000:5000 mywebapp
+	docker run -p 6000:5000 mywebapp
 
 # Scan the built image for vulnerabilities
 scan:
