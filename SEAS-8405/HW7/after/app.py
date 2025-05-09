@@ -15,7 +15,7 @@ def hello():
     return f"Hello, {name}!"
 
 @app.route('/ping')
-def ping():
+def ping_exec():
     # Get IP address from URL
     ip = request.args.get('ip')
     if not ip:
