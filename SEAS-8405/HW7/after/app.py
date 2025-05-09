@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify
 import os
 import ipaddress
-from ping3 import ping, PingError
+from ping3 import ping
 from simpleeval import simple_eval, SimpleEval, FunctionNotDefined
+
 
 app = Flask(__name__)
 
@@ -27,13 +28,11 @@ def ping():
         return jsonify({"error": "Invalid IP address format."}), 400
     
     # Execute ping command
-    try:
-        delay = ping(str(ip_address), timeout=2)
-        if delay is None:
-            return jsonify({"error": f"No response from {ip_address}"}), 504
-        return jsonify({"ip": str(ip_address), "delay_ms": round(delay * 1000, 2)})
-    except PingError as e:
+    delay = ping(str(ip_address), timeout=2)
+    if delay is None:
         return jsonify({"error": f"Ping failed: {str(e)}"}), 500
+    return jsonify({"ip": str(ip_address), "delay_ms": round(delay * 1000, 2)})
+    
 
 # Insecure use of eval
 @app.route('/calculate')
