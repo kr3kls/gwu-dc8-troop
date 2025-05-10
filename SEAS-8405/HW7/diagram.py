@@ -1,7 +1,6 @@
 from diagrams import Cluster, Diagram
 from diagrams.programming.framework import Flask
 from diagrams.onprem.network import Nginx
-from diagrams.onprem.database import PostgreSQL
 from diagrams.onprem.container import Docker
 from diagrams.onprem.client import User
 
