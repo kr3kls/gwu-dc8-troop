@@ -21,9 +21,4 @@ with Diagram(
             flask = Flask("Flask App (port 5000)")
             nginx >> flask
 
-        with Cluster("Docker Container: db"):
-            db = PostgreSQL("PostgreSQL (port 5432)")
-
-        docker >> nginx
-        flask >> db
-        user >> nginx
+        [docker, user] >> nginx
