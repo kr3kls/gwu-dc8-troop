@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 import ast
-import os
 import ipaddress
 from ping3 import ping
 

@@ -1,0 +1,39 @@
+docker scout recommendations mywebapp:latest
+
+
+  Target   │  mywebapp:latest   
+    digest │  4efd18c15eae      
+
+## Recommended fixes
+
+  Base image is  python:3-alpine 
+
+  Name            │  3-alpine                                                                  
+  Digest          │  sha256:8ac8fec07765e04af86657f68ce54230e0712d6f0a6f9a4a594d0cb8e872eb96   
+  Vulnerabilities │    0C     0H     0M     0L                                                 
+  Pushed          │ 1 month ago                                                                
+  Size            │ 17 MB                                                                      
+  Packages        │ 43                                                                         
+  Flavor          │ alpine                                                                     
+  OS              │ 3.21                                                                       
+  Runtime         │ 3.13.3                                                                     
+
+                                                                                                                                         
+  │ The base image is also available under the supported tag(s) `3-alpine3.21`, `3.13-alpine`, `3.13-alpine3.21`, `3.13.3-alpine`, `3.13.3-
+  │ alpine3.21`, `alpine`, `alpine3.21`. If you want to display recommendations specifically for a different tag, please re-run the      
+  command                                                                                                                                
+  │ using the `--tag` flag.                                                                                                               
+
+
+
+Refresh base image
+  Rebuild the image using a newer base image version. Updating this may result in breaking changes.
+
+  ✓ This image version is up to date.
+
+
+Change base image
+  The list displays new recommended tags in descending order, where the top results are rated as most suitable.
+
+  ✓ There are no tag recommendations at this time.
+
