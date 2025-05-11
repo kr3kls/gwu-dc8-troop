@@ -4,8 +4,6 @@ services:
     image: mywebapp
     ports:
     - 127.0.0.1:15000:15000
-    depends_on:
-    - db
     networks:
     - frontend
     read_only: true
@@ -17,5 +15,6 @@ services:
     - no-new-privileges:true
     mem_limit: 256m
     pids_limit: 100
+    cpus: 0.5
 networks:
   frontend: null

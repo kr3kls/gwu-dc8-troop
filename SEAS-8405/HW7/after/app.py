@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import ast
 import ipaddress
-from ping3 import ping
+import socket
 
 
 app = Flask(__name__)
@@ -26,11 +26,12 @@ def ping_exec():
     except ValueError as error:
         return jsonify({"error": "Invalid IP address format."}), 400
     
-    # Execute ping command
-    delay = ping(str(ip), timeout=2)
-    if delay is None:
-        return jsonify({"error": f"Ping failed: {str(e)}"}), 500
-    return jsonify({"ip": str(ip_address), "delay_ms": round(delay * 1000, 2)})
+    # Check connectivity
+    try:
+        with socket.create_connection((str(ip_address), 443), timeout=2) as s:
+            return jsonify({"ip": str(ip_address), "reachable": True})
+    except Exception as e:
+        return jsonify({"ip": str(ip_address), "reachable": False, "error": str(e)}), 500
     
 
 # Insecure use of eval
