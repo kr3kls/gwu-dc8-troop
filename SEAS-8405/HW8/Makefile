@@ -1,20 +1,21 @@
-# Use the appropriate compose command based on OS
-DOCKER_COMPOSE := $(shell if [ "$(shell uname)" = "Darwin" ]; then echo "docker compose"; else echo "docker-compose"; fi)
 
 .PHONY: up down reset logs
 
+DOCKER_COMPOSE := $(shell command -v docker-compose > /dev/null && echo docker-compose || echo docker compose)
+
 up:
-	@echo "[*] Starting Lab 1: Mini-Enterprise IAM Stack..."
-	@$(DOCKER_COMPOSE) up -d
-	@echo "[*] Populating LDAP with seed data..."
-	@cat seed.ldif | docker exec -i "$$($(DOCKER_COMPOSE) ps -q ldap)" ldapadd -x -D "cn=admin,dc=example,dc=com" -w adminpw
+	@echo "[*] Starting Lab 1 (Keycloak + Flask App)..."
+	@bash setup.sh
 
 down:
+	@echo "[*] Stopping and removing all lab containers and volumes..."
 	@$(DOCKER_COMPOSE) down -v
 
 reset: down
+	@echo "[*] Resetting lab environment..."
+	@rm -rf keycloak_data
 	@docker system prune -f
-	@make up
+	@bash setup.sh
 
 logs:
 	@$(DOCKER_COMPOSE) logs -f
