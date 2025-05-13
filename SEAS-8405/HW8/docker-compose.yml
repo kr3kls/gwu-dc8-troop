@@ -14,7 +14,6 @@ services:
       KC_DB_USERNAME: ${POSTGRES_USER}
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
       KC_DB_SCHEMA: public
-      #KEYCLOAK_IMPORT: /opt/keycloak/data/import/hw8-realm-realm.json
     ports:
       - "8080:8080"
     volumes:
