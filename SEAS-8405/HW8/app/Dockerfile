@@ -2,8 +2,8 @@
 FROM python:3.13-alpine AS base
 
 # Set environment variables for Python
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Set the working directory in the container
 WORKDIR /app
@@ -42,7 +42,7 @@ RUN chown -R appuser:appuser /app
 # Switch to the non-root user
 USER appuser
 
-# Expose the port the app runs on (Gunicorn will bind to this)
+# Expose the port the app runs on
 EXPOSE 5000
 
 # Start both nginx and Flask
