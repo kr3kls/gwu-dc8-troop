@@ -4,9 +4,15 @@ from functools import wraps
 import requests
 import jwt
 from jwt import PyJWKClient
-from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError, DecodeError
 
 main_bp = Blueprint('main', __name__)
+
+KEYCLOAK_BASE = lambda: current_app.config['KEYCLOAK_SERVER_URL'].rstrip('/')
+REALM_NAME = lambda: current_app.config['KEYCLOAK_REALM_NAME']
+CLIENT_ID = lambda: current_app.config['KEYCLOAK_CLIENT_ID']
+ISSUER = lambda: f"{KEYCLOAK_BASE()}/realms/{REALM_NAME()}"
+JWKS_URL = lambda: f"{KEYCLOAK_BASE()}/realms/{REALM_NAME()}/protocol/openid-connect/certs"
 
 def fetch_userinfo(access_token):
     keycloak_base = current_app.config['KEYCLOAK_SERVER_URL'].rstrip('/')
@@ -51,23 +57,18 @@ def decode_token(token):
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        auth_header = request.headers.get("Authorization", "")
-        if not auth_header.startswith("Bearer "):
+        auth = request.headers.get("Authorization", "")
+        if not auth.startswith("Bearer "):
             return jsonify({"message": "Authorization token is missing!"}), 401
-        token = auth_header.split()[1]
+        
+        token = auth.split()[1]
         if token.count('.') != 2:
-            current_app.logger.error("Malformed token structure")
             return jsonify({"message": "Malformed token"}), 400
 
         try:
-            claims = decode_token(token)
-            g.user = claims
+            g.user = decode_token(token)
             g.access_token = token
-        except ExpiredSignatureError:
-            current_app.logger.warning("Token has expired.")
-            return jsonify({"message": "Token expired!"}), 401
-        except InvalidTokenError as e:
-            current_app.logger.warning(f"Invalid token: {str(e)}")
+        except (ExpiredSignatureError, InvalidTokenError, DecodeError) as e:
             return jsonify({"message": "Invalid token!"}), 401
         except Exception as e:
             current_app.logger.error(f"Token validation failed: {e}")
@@ -77,42 +78,28 @@ def token_required(f):
     return decorated
 
 def roles_required(required_roles):
-    # Ensure required_roles is a list
     if isinstance(required_roles, str):
-        _required_roles = [required_roles]
-    else:
-        _required_roles = list(required_roles)
+        required_roles = [required_roles]
 
     def decorator(f):
         @wraps(f)
-        def decorated_function(*args, **kwargs):
-            # This decorator must run after @token_required, so g.user should exist
-            if not hasattr(g, 'user') or not g.user:
+        def decorated(*args, **kwargs):
+            if not getattr(g, 'user', None):
                 return jsonify({"message": "Authentication required for role check."}), 401
-            
-            user_roles = []
-            if 'realm_access' in g.user and isinstance(g.user['realm_access'], dict) and \
-               'roles' in g.user['realm_access'] and isinstance(g.user['realm_access']['roles'], list):
-                user_roles.extend(g.user['realm_access']['roles'])
-            
-            keycloak_client_id = current_app.config.get('KEYCLOAK_CLIENT_ID') 
-            if keycloak_client_id and 'resource_access' in g.user and \
-               isinstance(g.user['resource_access'], dict) and \
-               keycloak_client_id in g.user['resource_access'] and \
-               isinstance(g.user['resource_access'][keycloak_client_id], dict) and \
-               'roles' in g.user['resource_access'][keycloak_client_id] and \
-               isinstance(g.user['resource_access'][keycloak_client_id]['roles'], list):
-                user_roles.extend(g.user['resource_access'][keycloak_client_id]['roles'])
-            
-            user_roles = list(set(user_roles))
-            current_app.logger.debug(f"User roles: {user_roles}, Required roles: {_required_roles}")
 
-            if not any(role in user_roles for role in _required_roles):
-                current_app.logger.warning(f"User {g.user.get('preferred_username')} denied access. Missing roles: {_required_roles}")
-                return jsonify({"message": "Insufficient permissions to access this resource."}), 403
-            
+            roles = set()
+            realm_roles = g.user.get('realm_access', {}).get('roles', [])
+            roles.update(realm_roles)
+
+            resource_roles = g.user.get('resource_access', {}).get(CLIENT_ID(), {}).get('roles', [])
+            roles.update(resource_roles)
+
+            current_app.logger.debug(f"User roles: {roles}, Required roles: {required_roles}")
+            if not any(role in roles for role in required_roles):
+                return jsonify({"message": "Insufficient permissions."}), 403
+
             return f(*args, **kwargs)
-        return decorated_function
+        return decorated
     return decorator
 
 # Routes
