@@ -57,7 +57,7 @@ reset: down
 	@echo "[*] Resetting lab environment..."
 	@rm -rf keycloak_data
 	@docker system prune -f
-	@bash setup2.sh
+	@bash setup.sh
 
 logs:
 	@$(DOCKER_COMPOSE) logs -f
