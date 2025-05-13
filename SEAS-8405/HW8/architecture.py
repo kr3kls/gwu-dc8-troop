@@ -1,30 +1,33 @@
-from diagrams import Diagram, Cluster
+from diagrams import Diagram, Cluster, Edge
+from diagrams.programming.framework import Flask
+from diagrams.onprem.network import Nginx
 from diagrams.onprem.container import Docker
 from diagrams.onprem.database import PostgreSQL
 from diagrams.onprem.client import Users
-from diagrams.onprem.compute import Server
+from diagrams.custom import Custom
 
-with Diagram("IAM-Protected Flask App Architecture", show=True, direction="LR"):
+with Diagram("IAM-Protected Flask App Architecture", 
+             filename="./deliverables/architecture_diagram",
+             outformat="png",
+             show=False,
+             direction="LR"):
 
     user = Users("Client")
 
     with Cluster("Docker Compose Network: iam_network"):
 
         with Cluster("Keycloak IAM"):
-            keycloak = Docker("keycloak_iam")
+            keycloak = Custom("keycloak_iam", "./icons/Keycloak.png")
             keycloak_db = PostgreSQL("keycloak_db")
 
         with Cluster("Flask App Stack"):
             flask_app = Docker("flask_protected_api")
-            nginx = Docker("nginx (inside container)")
-            gunicorn = Docker("gunicorn (inside container)")
-            flask = Server("Flask App")
+            nginx = Nginx("Nginx (port 5000)")
+            flask = Flask("Flask App (port 5050)")
 
-            flask_app >> [nginx, gunicorn, flask]
+            nginx >> Edge() << flask_app >> Edge() << flask
 
-        # Internal connections
-        keycloak >> keycloak_db
-        flask_app >> keycloak
+        keycloak >> Edge() << keycloak_db
+        flask_app >> Edge() << keycloak
 
-    # External interaction
-    user >> flask_app
+    user >> Edge() << nginx
