@@ -1,3 +1,4 @@
+import os
 from diagrams import Diagram, Cluster, Edge
 from diagrams.programming.framework import Flask
 from diagrams.onprem.network import Nginx
@@ -7,7 +8,7 @@ from diagrams.onprem.client import Users
 from diagrams.custom import Custom
 
 with Diagram("IAM-Protected Flask App Architecture", 
-             filename="./deliverables/architecture_diagram",
+             filename="architecture_diagram",
              outformat="png",
              show=False,
              direction="LR"):
@@ -17,7 +18,7 @@ with Diagram("IAM-Protected Flask App Architecture",
     with Cluster("Docker Compose Network: iam_network"):
 
         with Cluster("Keycloak IAM"):
-            keycloak = Custom("keycloak_iam", "./icons/Keycloak.png")
+            keycloak = Custom("keycloak_iam", "./Keycloak.png")
             keycloak_db = PostgreSQL("keycloak_db")
 
         with Cluster("Flask App Stack"):
