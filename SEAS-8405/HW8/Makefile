@@ -55,7 +55,7 @@ down:
 
 reset: down
 	@echo "[*] Resetting lab environment..."
-	@rm -rf keycloak_data
+	@rm -rf keycloak_config
 	@docker system prune -f
 	@bash setup.sh
 

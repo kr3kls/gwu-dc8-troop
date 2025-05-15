@@ -17,7 +17,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./keycloak_config/import:/opft/keycloak/data/import 
+      - ./keycloak_config/:/opft/keycloak/data/config
     depends_on:
       - keycloak_db
     networks:
@@ -65,6 +65,7 @@ services:
       context: ./app
       dockerfile: Dockerfile
     container_name: flask_protected_api
+    image: flask-api:latest
     restart: unless-stopped
     ports:
       - "127.0.0.1:5000:5000"
