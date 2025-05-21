@@ -587,7 +587,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "1ZCvlNCp96BMBtPhL4MwBSgSMUUkUnfm",
-    "redirectUris" : [ "http://localhost:5000/callback" ],
+    "redirectUris" : [ "http://localhost:5000/authorize" ],
     "webOrigins" : [ "http://localhost:5000" ],
     "notBefore" : 0,
     "bearerOnly" : false,

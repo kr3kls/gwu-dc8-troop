@@ -14,6 +14,11 @@ services:
       KC_DB_USERNAME: ${POSTGRES_USER}
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
       KC_DB_SCHEMA: public
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: "8080"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
     ports:
       - "8080:8080"
     volumes:
@@ -78,6 +83,7 @@ services:
       FLASK_ENV: development
       FLASK_DEBUG: "1"
       KEYCLOAK_SERVER_URL: "http://localhost:8080"
+      KEYCLOAK_INTERNAL_URL: "http://keycloak:8080"
       KEYCLOAK_REALM_NAME: "hw8"
       KEYCLOAK_CLIENT_ID: "flask-api-client"
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}

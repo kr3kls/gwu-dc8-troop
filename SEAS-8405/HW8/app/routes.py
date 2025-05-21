@@ -112,25 +112,25 @@ def index():
 
 @main_bp.route('/login')
 def login():
-    # Redirect to Keycloak for authentication
-    redirect_uri = url_for('main.authorize', _external=True)
+    redirect_uri = "http://localhost:5000/authorize"
+    current_app.logger.info(f"Redirect URI used: {redirect_uri}")
     return current_app.oauth.keycloak.authorize_redirect(redirect_uri)
 
 @main_bp.route('/authorize')
 def authorize():
     try:
-        # Exchange authorization code for tokens
         token = current_app.oauth.keycloak.authorize_access_token()
+        userinfo = token.get('userinfo') or current_app.oauth.keycloak.userinfo(token=token)
 
-        userinfo = token.get('userinfo')
-        if not userinfo:
-            userinfo = current_app.oauth.keycloak.userinfo(token=token)
+        # Only store essential fields
+        session['user'] = {
+            "sub": userinfo.get("sub"),
+            "preferred_username": userinfo.get("preferred_username"),
+            "email": userinfo.get("email")
+        }
+        session['access_token'] = token.get("access_token")
 
-        session['user'] = userinfo
-        session['user_token'] = token
         current_app.logger.info(f"User {userinfo.get('preferred_username')} logged in successfully.")
-        
-        # Redirect to a protected area or home page
         return redirect(url_for('main.profile'))
     except OAuth2Error as error:
         current_app.logger.error(f"OAuth2Error during token exchange: {error.description}")
@@ -138,7 +138,6 @@ def authorize():
     except Exception as e:
         current_app.logger.error(f"Exception during authorization: {e}")
         return jsonify(error="Authentication failed", description=str(e)), 500
-
 
 @main_bp.route('/profile')
 def profile():
