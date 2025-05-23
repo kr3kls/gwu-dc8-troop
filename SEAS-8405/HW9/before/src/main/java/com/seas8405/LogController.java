@@ -10,7 +10,8 @@ public class LogController {
 
     @PostMapping("/log")
     public String logInput(@RequestBody String input) {
-        logger.info("User input: " + input);
+        logger.info("User input:");
+        logger.info(input);
         return "Logged: " + input;
     }
 }
