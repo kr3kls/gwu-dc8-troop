@@ -15,3 +15,5 @@ clean:
 	docker system prune -f
 
 restart: stop start
+
+reset: stop clean build start
