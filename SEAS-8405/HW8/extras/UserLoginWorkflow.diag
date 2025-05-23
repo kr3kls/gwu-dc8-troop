@@ -1,0 +1,29 @@
+# UserLoginWorkflow.diag
+seqdiag {
+  activation = none;
+
+  // Participants
+  User_Browser;
+  Flask_App_Client [label="Flask Application\n(OIDC Client)"];
+  Keycloak_Auth_Server [label="Keycloak\n(Authorization Server)"];
+
+  // Flow
+  User_Browser -> Flask_App_Client [label = "1. User accesses /login"];
+  Flask_App_Client -> User_Browser [label = "2. HTTP 302 Redirect to Keycloak\n(Authorization URL incl. client_id, redirect_uri,\nscope, state, nonce, PKCE challenge)"];
+  User_Browser -> Keycloak_Auth_Server [label = "3. Browser requests Keycloak Authorization URL"];
+  Keycloak_Auth_Server -> Keycloak_Auth_Server [label = "4. User authenticates with Keycloak\n(enters credentials, MFA if any, consents if needed)"];
+  Keycloak_Auth_Server -> User_Browser [label = "5. HTTP 302 Redirect to Flask App's /authorize\n(Callback with Authorization Code & state)"];
+  User_Browser -> Flask_App_Client [label = "6. Browser hits /authorize with Authorization Code"];
+
+  Flask_App_Client -> Keycloak_Auth_Server [label = "7. POST /token (Exchange Auth Code for tokens)\n(Incl. code, client_id, client_secret, redirect_uri, PKCE verifier)\n[Server-to-Server: Uses http://keycloak:8080]"];
+  Keycloak_Auth_Server --> Flask_App_Client [label = "8. Returns ID Token, Access Token, Refresh Token"];
+
+  Flask_App_Client -> Keycloak_Auth_Server [label = "9. Fetch JWKS from /certs\n(For Authlib's ID Token signature validation)\n[Server-to-Server: Uses http://keycloak:8080]"];
+  Keycloak_Auth_Server --> Flask_App_Client [label = "10. Returns JWKS"];
+  Flask_App_Client -> Flask_App_Client [label = "11. Authlib validates ID Token\n(signature, iss, aud, exp, nonce)"];
+
+  Flask_App_Client -> Keycloak_Auth_Server [label = "12. GET /userinfo (using Access Token)\n(To get user claims)\n[Server-to-Server: Uses http://keycloak:8080]"];
+  Keycloak_Auth_Server --> Flask_App_Client [label = "13. Returns User Claims (e.g., preferred_username, email)"];
+  Flask_App_Client -> Flask_App_Client [label = "14. Stores userinfo & tokens in Flask session"];
+  Flask_App_Client -> User_Browser [label = "15. HTTP 302 Redirect to /profile (or desired page)"];
+}

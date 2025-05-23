@@ -1,0 +1,117 @@
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak_iam
+    command: start-dev
+    restart: unless-stopped
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL_HOST: keycloak_db
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_DB_SCHEMA: public
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: "8080"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak_config/:/opft/keycloak/data/config
+    depends_on:
+      - keycloak_db
+    networks:
+      - iam_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    mem_limit: 1024m
+    pids_limit: 200
+    cpus: 2
+    security_opt:
+    - no-new-privileges:true
+
+  keycloak_db:
+    image: postgres:latest
+    container_name: keycloak_postgres_db
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    networks:
+      - iam_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    mem_limit: 256m
+    pids_limit: 100
+    cpus: 0.5
+    security_opt:
+    - no-new-privileges:true
+
+  flask_app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: flask_protected_api
+    image: flask-api:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5000:5000"
+    tmpfs:
+      - /var/lib/nginx:uid=1000,gid=1000,mode=1777
+      - /var/log/nginx:uid=1000,gid=1000,mode=1777
+      - /run:uid=1000,gid=1000,mode=1777
+    environment:
+      FLASK_APP: app.py
+      FLASK_ENV: development
+      FLASK_DEBUG: "1"
+      KEYCLOAK_SERVER_URL: "http://localhost:8080"
+      KEYCLOAK_INTERNAL_URL: "http://keycloak:8080"
+      KEYCLOAK_REALM_NAME: "hw8"
+      KEYCLOAK_CLIENT_ID: "flask-api-client"
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+      OIDC_CLIENT_SECRETS_PATH: "/app/client_secrets.json"
+      APP_SECRET_KEY: ${APP_SECRET_KEY}
+    volumes:
+      - ./app:/app
+    depends_on:
+      - keycloak
+    networks:
+      - iam_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    mem_limit: 256m
+    pids_limit: 100
+    cpus: 0.5
+    security_opt:
+    - no-new-privileges:true
+    read_only: true
+
+
+volumes:
+  postgres_data:
+
+networks:
+  iam_network:
+    driver: bridge

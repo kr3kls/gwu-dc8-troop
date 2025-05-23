@@ -1,0 +1,22 @@
+# ProtectedApiAccessWorkflow.diag
+seqdiag {
+  activation = none;
+
+  // Participants
+  External_API_Client [label="External API Client\n(e.g., Postman, SPA, Mobile App)"];
+  Flask_API_Resource_Server [label="Flask Application\n(API / Resource Server)"];
+  Keycloak_Auth_Server [label="Keycloak\n(Authorization Server - for JWKS)"];
+
+  // Flow
+  External_API_Client -> Flask_API_Resource_Server [label = "1. Request to /api/protected_route\n(Header: Authorization: Bearer <access_token>)"];
+  Flask_API_Resource_Server -> Flask_API_Resource_Server [label = "2. @token_required decorator intercepts:\nExtracts Access Token"];
+
+  Flask_API_Resource_Server -> Keycloak_Auth_Server [label = "3. decode_token(): Fetch JWKS from /certs\n(To get public key for signature validation)\n[Server-to-Server: Uses http://keycloak:8080]"];
+  Keycloak_Auth_Server --> Flask_API_Resource_Server [label = "4. Returns JWKS"];
+  Flask_API_Resource_Server -> Flask_API_Resource_Server [label = "5. decode_token(): Validate Access Token\n(Signature with JWKS, Issuer, Audience, Expiration)\nStores decoded claims in g.user"];
+
+  Flask_API_Resource_Server -> Flask_API_Resource_Server [label = "6. @roles_required decorator (if present):\nChecks roles in g.user (decoded token claims)"];
+
+  Flask_API_Resource_Server -> Flask_API_Resource_Server [label = "7. Execute protected API endpoint logic"];
+  Flask_API_Resource_Server --> External_API_Client [label = "8. HTTP 200 OK (or other status)\n(Returns API JSON response)"];
+}
