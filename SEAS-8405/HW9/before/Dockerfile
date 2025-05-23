@@ -12,12 +12,4 @@ WORKDIR /app
 
 COPY --from=build /app/target/log4shell-demo-0.0.1-SNAPSHOT.jar /app.jar
 
-ENTRYPOINT [ \
-  "java", \
-  "-Dlog4j2.debug=true", \
-  "-Dlog4j2.formatMsgNoLookups=false", \
-  "-Dcom.sun.jndi.ldap.object.trustURLCodebase=true", \
-  "-Dcom.sun.jndi.ldap.object.factories=*", \
-  "-jar", \
-  "/app.jar" \
-]
+ENTRYPOINT ["java", "-jar", "/app.jar"]
