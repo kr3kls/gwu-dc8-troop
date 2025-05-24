@@ -15,7 +15,7 @@ def main():
             data = conn.recv(1024)
             print(f"[+] Received data: {data.hex()}")
 
-            conn.close()
+            # conn.close()
 
 if __name__ == '__main__':
     main()
