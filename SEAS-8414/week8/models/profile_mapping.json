@@ -1,0 +1,17 @@
+{
+    "Cluster 0": {
+        "name": "Hacktivist",
+        "icon": "\ud83d\udce2",
+        "description": "This threat profile is characteristic of hacktivists, who are motivated by political or social causes. Their attacks are often opportunistic and designed to spread a message. The key indicator for this profile is the presence of political keywords in the URL, and they may use a mix of other tactics, such as long URLs, to convey their message."
+    },
+    "Cluster 1": {
+        "name": "State-Sponsored Actor",
+        "icon": "\ud83d\udd75\ufe0f",
+        "description": "This profile matches the tactics of sophisticated state-sponsored actors. Their attacks are subtle, well-crafted, and designed for stealth and persistence. They often use valid SSL certificates to appear legitimate and employ deceptive prefixes or suffixes in domain names to mimic trusted brands. They actively avoid 'noisy' indicators like IP addresses in URLs."
+    },
+    "Cluster 2": {
+        "name": "Organized Cybercrime",
+        "icon": "\ud83d\udcb8",
+        "description": "This activity aligns with financially motivated cybercrime groups. Their methods are often high-volume and technically straightforward, prioritizing quantity over sophistication. They commonly use IP addresses directly in URLs, rely heavily on URL shortening services, and employ abnormal URL structures to evade simple filters."
+    }
+}
