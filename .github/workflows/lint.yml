@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'SEAS-8414/week8/**'
+      - 'SEAS-8414/week9/**'
   pull_request:
     paths:
       - 'SEAS-8414/week8/**'
