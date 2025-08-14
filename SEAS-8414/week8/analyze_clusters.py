@@ -3,18 +3,19 @@ from pycaret.clustering import load_model, predict_model
 import json
 import os
 
+
 def analyze_and_map_clusters():
     """
     Loads the trained clustering model and the dataset to automatically map
     cluster labels to human-readable threat actor profiles.
     """
     print("Loading assets for cluster analysis...")
-    
+
     # Define paths
     model_path = 'models/threat_actor_profiler'
     data_path = 'data/phishing_synthetic.csv'
     output_path = 'models/profile_mapping.json'
-    
+
     # Check if files exist
     if not os.path.exists(model_path + '.pkl') or not os.path.exists(data_path):
         print("Error: Model or data file not found. Run train_model.py first.")
@@ -30,7 +31,7 @@ def analyze_and_map_clusters():
     # Use the model to predict the cluster for each phishing data point
     predictions = predict_model(model, data=phishing_data)
     predictions['profile'] = phishing_data['profile'].values
-    
+
     # Create a crosstab to see the distribution of true profiles in each predicted cluster
     # This is the core of the automated labeling logic
     crosstab = pd.crosstab(predictions['Cluster'], predictions['profile'])
@@ -39,7 +40,7 @@ def analyze_and_map_clusters():
 
     # Determine the dominant profile for each cluster
     cluster_to_profile = crosstab.idxmax(axis="columns")
-    
+
     # Static descriptions to be merged with the dynamic mapping
     profile_descriptions = {
         'state_sponsored': {
@@ -70,7 +71,7 @@ def analyze_and_map_clusters():
                 'icon': "❓",
                 'description': "No description available."
             }
-            
+
     print("\nGenerated Profile Mapping:")
     # Use json.dumps for logging
     print(json.dumps(final_mapping, indent=2))
@@ -78,8 +79,9 @@ def analyze_and_map_clusters():
     # Save the mapping to JSON file for Streamlit
     with open(output_path, 'w') as f:
         json.dump(final_mapping, f, indent=4)
-        
+
     print(f"\nSuccessfully saved profile mapping to {output_path}")
+
 
 if __name__ == "__main__":
     analyze_and_map_clusters()
