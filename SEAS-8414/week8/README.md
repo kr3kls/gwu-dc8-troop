@@ -1,10 +1,11 @@
 # GenAI-Powered Mini-SOAR for Phishing Analysis
 
-This project is a prototype Security Orchestration, Automation, and Response (SOAR) application built with Python. It uses a machine learning model to predict if a URL is malicious and leverages Generative AI to prescribe a response plan. The entire application is containerized with Docker and orchestrated with Docker Compose for easy setup and deployment.
+This project is a prototype Security Orchestration, Automation, and Response (SOAR) application built with Python. It uses a machine learning model to predict if a URL is malicious, a clustering model to determine attribution, and leverages Generative AI to prescribe a response plan. The entire application is containerized with Docker and orchestrated with Docker Compose for easy setup and deployment.
 
 ## Features
 
 -   **Predictive Analytics**: Uses PyCaret to automatically train a model on a real-world phishing dataset.
+-   **Unsupervised Attribution**: Clusters malicious events into threat actor categories to enrich alerts with operational context.
 -   **Prescriptive Analytics**: Integrates with Google Gemini, OpenAI, and Grok to generate detailed incident response plans.
 -   **Interactive UI**: A user-friendly web interface built with the latest version of Streamlit.
 -   **Containerized**: Fully containerized with Docker and managed with Docker Compose for a reproducible environment.
@@ -71,8 +72,12 @@ hands-on_wk8/
 ├── docker-compose.yml
 ├── Dockerfile
 ├── genai_prescriptions.py
+├── INSTALL.md
 ├── logs.log
 ├── Makefile
+├── README.md
 ├── requirements.txt
+├── test.py
+TESTING.md
 └── train_model.py
 ```
