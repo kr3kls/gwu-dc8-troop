@@ -189,6 +189,6 @@ else:
             with st.expander("Show Raw GenAI Output"):
                 st.json(prescription)
         elif is_malicious and not prescription:
-             st.error("An error occurred while generating the response plan.")
+            st.error("An error occurred while generating the response plan.")
         else:
             st.info("No prescriptive plan was generated because the URL was classified as benign.")

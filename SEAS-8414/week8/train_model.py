@@ -13,12 +13,12 @@ def generate_synthetic_data(num_samples=600):
     """
     print("Generating synthetic dataset with more distinct threat actor profiles...")
 
-    features = [
-        'having_IP_Address', 'URL_Length', 'Shortining_Service',
-        'having_At_Symbol', 'double_slash_redirecting', 'Prefix_Suffix',
-        'having_Sub_Domain', 'SSLfinal_State', 'URL_of_Anchor', 'Links_in_tags',
-        'SFH', 'Abnormal_URL', 'has_political_keyword'
-    ]
+    # features = [
+    #     'having_IP_Address', 'URL_Length', 'Shortining_Service',
+    #     'having_At_Symbol', 'double_slash_redirecting', 'Prefix_Suffix',
+    #     'having_Sub_Domain', 'SSLfinal_State', 'URL_of_Anchor', 'Links_in_tags',
+    #     'SFH', 'Abnormal_URL', 'has_political_keyword'
+    # ]
 
     num_benign = num_samples // 2
     num_phishing_samples = num_samples - num_benign
@@ -122,7 +122,7 @@ def generate_synthetic_data(num_samples=600):
 
 def train():
     """
-    Trains and saves a classification model to detect phishing URLs and a 
+    Trains and saves a classification model to detect phishing URLs and a
     clustering model to profile different types of phishing attacks.
     """
     classification_model_path = 'models/phishing_url_detector'
@@ -137,7 +137,7 @@ def train():
 
     # 1. CLASSIFICATION WORKFLOW
     print("\n--- Starting Classification Workflow ---")
-    s_class = classification.setup(data, target='label', session_id=42, 
+    s_class = classification.setup(data, target='label', session_id=42,
                                    ignore_features=['profile'], verbose=False)
     best_model = classification.compare_models(n_select=1, include=['rf', 'et', 'lightgbm'])
     final_classifier = classification.finalize_model(best_model)
@@ -163,7 +163,7 @@ def train():
     print("\n--- Starting Automated Profile Labeling ---")
     try:
         # Ensure analyze_clusters.py is executable
-        if os.name != 'nt': # For Linux/macOS
+        if os.name != 'nt':  # For Linux/macOS
             subprocess.run(['chmod', '+x', 'analyze_clusters.py'], check=True)
 
         # Run the analysis script to generate the mapping
