@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from pathlib import Path
 from pycaret.classification import load_model as load_clf_model, predict_model as predict_clf_model
 from pycaret.clustering import load_model as load_clu_model, predict_model as predict_clu_model
 from genai_prescriptions import generate_prescription
@@ -14,27 +15,34 @@ st.set_page_config(
     layout="wide"
 )
 
+BASE_DIR = Path(__file__).resolve().parent
+
 
 # Load Models and Assets
 @st.cache_resource
 def load_assets():
     """Loads all necessary models, plots, and mappings from disk."""
-    clf_model_path = 'models/phishing_url_detector'
-    clu_model_path = 'models/threat_actor_profiler'
-    plot_path = 'models/feature_importance.png'
-    mapping_path = 'models/profile_mapping.json'
+    clf_model_path = BASE_DIR / 'models' / 'phishing_url_detector'
+    clu_model_path = BASE_DIR / 'models' / 'threat_actor_profiler'
+    plot_path = BASE_DIR / 'models' / 'feature_importance.png'
+    mapping_path = BASE_DIR / 'models' / 'profile_mapping.json'
 
+    clf_model_pkl = clf_model_path.with_suffix('.pkl')
+    clu_model_pkl = clu_model_path.with_suffix('.pkl')
     clf_model, clu_model, plot, mapping = None, None, None, None
 
-    if os.path.exists(clf_model_path + '.pkl'):
+    if clf_model_pkl.exists():
         clf_model = load_clf_model(clf_model_path, verbose=False)
-    if os.path.exists(clu_model_path + '.pkl'):
+    if clu_model_pkl.exists():
         clu_model = load_clu_model(clu_model_path, verbose=False)
-    if os.path.exists(plot_path):
+    if plot_path.is_file():
         plot = plot_path
-    if os.path.exists(mapping_path):
-        with open(mapping_path, 'r') as f:
-            mapping = json.load(f)
+    if mapping_path.is_file():
+        try:
+            with mapping_path.open('r', encoding='utf-8') as f:
+                mapping = json.load(f)
+        except Exception as e:
+            st.error(f"Error reading mapping JSON: {e}")
 
     return clf_model, clu_model, plot, mapping
 
