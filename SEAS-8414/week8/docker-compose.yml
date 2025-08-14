@@ -7,6 +7,4 @@ services:
     volumes:
       - .:/app
     # Command to train the model
-    command-1: /bin/sh -c "python train_model.py"
-    # Command to run the application after training is complete
-    command-2: /bin/sh -c "streamlit run app.py --server.fileWatcherType none"
+    command: /bin/sh -c "python train_model.py && streamlit run app.py --server.fileWatcherType none"
