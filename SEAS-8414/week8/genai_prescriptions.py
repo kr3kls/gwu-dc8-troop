@@ -12,6 +12,7 @@ except (KeyError, FileNotFoundError):
     print("API keys not found in .streamlit/secrets.toml. Some features may be disabled.")
     grok_api_key = None
 
+
 def get_base_prompt(alert_details):
     return f"""
     You are an expert Security Orchestration, Automation, and Response (SOAR) system.
@@ -28,12 +29,14 @@ def get_base_prompt(alert_details):
     Return ONLY the raw JSON object and nothing else.
     """
 
+
 def get_gemini_prescription(alert_details):
     model = genai.GenerativeModel('gemini-1.5-flash')
     prompt = get_base_prompt(alert_details)
     # Removing "json" from the start of the string if Gemini includes it
     response_text = model.generate_content(prompt).text.strip().lstrip("```json\n").rstrip("```")
     return json.loads(response_text)
+
 
 def get_openai_prescription(alert_details):
     client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
@@ -45,6 +48,7 @@ def get_openai_prescription(alert_details):
     )
     return json.loads(response.choices[0].message.content)
 
+
 def get_grok_prescription(alert_details):
     if not grok_api_key:
         return {"error": "Grok API key not configured."}
@@ -55,6 +59,7 @@ def get_grok_prescription(alert_details):
     response = requests.post(url, headers=headers, json=data)
     content_str = response.json()['choices'][0]['message']['content']
     return json.loads(content_str.strip().lstrip("```json\n").rstrip("```"))
+
 
 def generate_prescription(provider, alert_details):
     if provider == "Gemini":

@@ -14,6 +14,7 @@ st.set_page_config(
     layout="wide"
 )
 
+
 # Load Models and Assets
 @st.cache_resource
 def load_assets():
@@ -22,7 +23,7 @@ def load_assets():
     clu_model_path = 'models/threat_actor_profiler'
     plot_path = 'models/feature_importance.png'
     mapping_path = 'models/profile_mapping.json'
-    
+
     clf_model, clu_model, plot, mapping = None, None, None, None
 
     if os.path.exists(clf_model_path + '.pkl'):
@@ -34,8 +35,9 @@ def load_assets():
     if os.path.exists(mapping_path):
         with open(mapping_path, 'r') as f:
             mapping = json.load(f)
-        
+
     return clf_model, clu_model, plot, mapping
+
 
 clf_model, clu_model, feature_plot, profile_mapping = load_assets()
 
@@ -120,14 +122,14 @@ else:
             cluster_prediction = predict_clu_model(clu_model, data=input_data)
             predicted_cluster = cluster_prediction['Cluster'].iloc[0]
             threat_profile = profile_mapping.get(predicted_cluster)
-            
+
             profile_name = "Unknown Profile"
             if threat_profile:
                 profile_name = threat_profile.get('name', profile_name)
 
             st.write(f"▶️ **Step 4: Attribution Complete** - Profiled as **{profile_name}**.")
             time.sleep(1)
-            
+
             st.write(f"▶️ **Step 5: Prescriptive Analytics** - Engaging **{genai_provider}** for action plan.")
             try:
                 prescription = generate_prescription(genai_provider, {k: v for k, v in input_dict.items()})
@@ -183,7 +185,7 @@ else:
 
             st.write("#### Communication Draft (for End-User/Reporter)")
             st.text_area("Draft", prescription.get("communication_draft", ""), height=150)
-            
+
             with st.expander("Show Raw GenAI Output"):
                 st.json(prescription)
         elif is_malicious and not prescription:

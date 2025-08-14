@@ -5,6 +5,7 @@ from pycaret import clustering
 import os
 import subprocess
 
+
 def generate_synthetic_data(num_samples=600):
     """
     Generates a synthetic dataset of URL features, simulating benign traffic
@@ -23,11 +24,11 @@ def generate_synthetic_data(num_samples=600):
     num_phishing_samples = num_samples - num_benign
     num_per_profile = num_phishing_samples // 3
     remainder = num_phishing_samples % 3
-    
+
     sizes = [num_per_profile] * 3
     for i in range(remainder):
         sizes[i] += 1
-    
+
     size_state, size_crime, size_hacktivist = sizes[0], sizes[1], sizes[2]
 
     # Profile 1 - State-Sponsored: Emphasize valid SSL, deceptive domains (Prefix_Suffix), and avoiding obvious red flags.
@@ -108,13 +109,13 @@ def generate_synthetic_data(num_samples=600):
 
     # Combine all dataframes
     df_phishing = pd.concat([df_state_sponsored, df_organized_crime, df_hacktivist], ignore_index=True)
-    
+
     # Assign labels: 1 for any phishing, 0 for benign
     df_phishing['label'] = 1
     df_benign['label'] = 0
 
     final_df = pd.concat([df_phishing, df_benign], ignore_index=True)
-    
+
     # Shuffle the dataset and return
     return final_df.sample(frac=1).reset_index(drop=True)
 
@@ -127,7 +128,7 @@ def train():
     classification_model_path = 'models/phishing_url_detector'
     clustering_model_path = 'models/threat_actor_profiler'
     plot_path = 'models/feature_importance.png'
-    
+
     os.makedirs('models', exist_ok=True)
     os.makedirs('data', exist_ok=True)
 
@@ -140,7 +141,7 @@ def train():
                                    ignore_features=['profile'], verbose=False)
     best_model = classification.compare_models(n_select=1, include=['rf', 'et', 'lightgbm'])
     final_classifier = classification.finalize_model(best_model)
-    
+
     classification.plot_model(final_classifier, plot='feature', save=True)
     if os.path.exists('Feature Importance.png'):
         os.rename('Feature Importance.png', plot_path)
@@ -157,14 +158,14 @@ def train():
     kmeans = clustering.create_model('kmeans', num_clusters=3)
     clustering.save_model(kmeans, clustering_model_path)
     print(f"Clustering model saved to {clustering_model_path}.pkl")
-    
+
     # 3. AUTOMATED PROFILE LABELING
     print("\n--- Starting Automated Profile Labeling ---")
     try:
         # Ensure analyze_clusters.py is executable
         if os.name != 'nt': # For Linux/macOS
             subprocess.run(['chmod', '+x', 'analyze_clusters.py'], check=True)
-        
+
         # Run the analysis script to generate the mapping
         subprocess.run(['python', 'analyze_clusters.py'], check=True)
         print("Profile mapping generated successfully.")
