@@ -13,13 +13,6 @@ def generate_synthetic_data(num_samples=600):
     """
     print("Generating synthetic dataset with more distinct threat actor profiles...")
 
-    # features = [
-    #     'having_IP_Address', 'URL_Length', 'Shortining_Service',
-    #     'having_At_Symbol', 'double_slash_redirecting', 'Prefix_Suffix',
-    #     'having_Sub_Domain', 'SSLfinal_State', 'URL_of_Anchor', 'Links_in_tags',
-    #     'SFH', 'Abnormal_URL', 'has_political_keyword'
-    # ]
-
     num_benign = num_samples // 2
     num_phishing_samples = num_samples - num_benign
     num_per_profile = num_phishing_samples // 3
