@@ -1,0 +1,5 @@
+Here is a simple, step-by-step incident response playbook for a Tier 1 analyst:
+
+1.  **Investigate Internal Traffic:** Search DNS, proxy, and firewall logs for any instances of '1qw0wj01buakpscg.com'.
+2.  **Immediate Blocking:** If any communication with this domain is observed, immediately add '1qw0wj01buakpscg.com' to all relevant network blacklists (e.g., firewall, DNS sinkhole, proxy).
+3.  **Document & Escalate:** Document your findings, including whether the domain was observed internally and actions taken. Escalate the incident to a Tier 2 analyst for further investigation into potential compromise.
