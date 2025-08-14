@@ -50,6 +50,10 @@ With the `Makefile`, running the application is simple.
     make clean
     ```
 
+## Testing
+
+Testing instructions located in [TESTING.md](TESTING.md).
+
 ## Project Structure
 ```
 hands-on_wk8/
