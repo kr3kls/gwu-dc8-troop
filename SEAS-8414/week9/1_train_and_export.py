@@ -6,12 +6,13 @@ import h2o
 from h2o.automl import H2OAutoML
 
 
-# Part 1 - Generate dga_dataset_train.csv 
+# Part 1 - Generate dga_dataset_train.csv
 def get_entropy(s):
     p, lns = {}, float(len(s))
     for c in s:
         p[c] = p.get(c, 0) + 1
     return -sum(count/lns * math.log(count/lns, 2) for count in p.values())
+
 
 # Create sample data
 header = ['domain', 'length', 'entropy', 'class']
@@ -37,8 +38,8 @@ print("dga_dataset_train.csv created successfully.")
 # Part 2 - H2O AutoML Execution
 h2o.init()
 train = h2o.import_file("dga_dataset_train.csv")
-x = ['length', 'entropy'] # Features
-y = "class"               # Target
+x = ['length', 'entropy']  # Features
+y = "class"                # Target
 train[y] = train[y].asfactor()
 
 aml = H2OAutoML(max_models=20, max_runtime_secs=120, seed=1)

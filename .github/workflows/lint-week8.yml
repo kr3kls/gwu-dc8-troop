@@ -1,4 +1,4 @@
-name: Python Flake8 Linter (Week 8)
+name: Python Flake8 Linter Week 8
 
 on:
   push:
