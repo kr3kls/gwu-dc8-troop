@@ -4,7 +4,6 @@ from pathlib import Path
 from pycaret.classification import load_model as load_clf_model, predict_model as predict_clf_model
 from pycaret.clustering import load_model as load_clu_model, predict_model as predict_clu_model
 from genai_prescriptions import generate_prescription
-import os
 import time
 import json
 
