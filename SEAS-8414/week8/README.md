@@ -57,7 +57,7 @@ Testing instructions located in [TESTING.md](TESTING.md).
 
 ## Project Structure
 ```
-hands-on_wk8/
+week8/
 ├── .streamlit
 |   └── secrets.toml
 ├── data/
@@ -78,6 +78,6 @@ hands-on_wk8/
 ├── README.md
 ├── requirements.txt
 ├── test.py
-TESTING.md
+├── TESTING.md
 └── train_model.py
 ```

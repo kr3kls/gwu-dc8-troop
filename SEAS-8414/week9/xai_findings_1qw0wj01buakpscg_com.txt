@@ -1,0 +1,5 @@
+- Alert: Potential DGA domain detected.
+- Domain: '1qw0wj01buakpscg.com'
+- AI Model Explanation (from SHAP): The model flagged this domain with 100.0% confidence. The classification was primarily driven by:
+  - A 'length' value of 20 (strongly pushed the prediction towards 'dga').
+  - A 'entropy' value of 3.9219 (slightly pushed the prediction towards 'dga').

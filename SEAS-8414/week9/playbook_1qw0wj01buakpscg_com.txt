@@ -1,0 +1,5 @@
+Here are the steps for the Tier 1 analyst:
+
+1.  **Identify Source Host:** Determine which internal host attempted to communicate with the domain '1qw0wj01buakpscg.com'.
+2.  **Isolate Host:** Immediately isolate the identified host from the network.
+3.  **Escalate Incident:** Document all findings and escalate the incident to a Tier 2 analyst or SOC Lead.
