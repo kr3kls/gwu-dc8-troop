@@ -34,6 +34,7 @@ Testing instructions located in [TESTING.md](TESTING.md).
 week9/
 ├── models
 |   └── GBM_grid_1_AutoML_1_20250814_180359_model_1.zip
+├── .env
 ├── data/
 |   └── phishing_synthetic.csv
 ├── 1_train_and_export.py
