@@ -15,10 +15,11 @@ from pathlib import Path
 # Load variables from .env into environment
 load_dotenv()
 
+# Set Gemini variables
 GEMINI_MODEL = "gemini-2.5-flash-preview-05-20"
 GEMINI_URL_TMPL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
-
+# Method to get entropy of URL
 def _get_entropy(s: str) -> float:
     if not s:
         return 0.0
@@ -28,7 +29,7 @@ def _get_entropy(s: str) -> float:
     ln = float(len(s))
     return -sum((cnt / ln) * math.log(cnt / ln, 2) for cnt in counts.values())
 
-
+# Method to find and load model
 def _resolve_mojo() -> Path:
     models_dir = Path(__file__).parent / "models"
     zips = sorted(models_dir.glob("*.zip"), key=lambda p: p.stat().st_mtime, reverse=True)
@@ -37,18 +38,24 @@ def _resolve_mojo() -> Path:
         sys.exit(2)
     return zips[0]
 
-
+# Method to get probability from h2o dataframe
 def _get_prob_column_for_class(preds_df, cls_name: str):
     cols = list(preds_df.columns)
+
+    # Class name is a column name
     if cls_name in cols:
         return cls_name
+    
+    # Check for case issues
     lower_map = {c.lower(): c for c in cols}
     if cls_name.lower() in lower_map:
         return lower_map[cls_name.lower()]
+    
+    # Default to last probability column
     prob_cols = [c for c in cols if c != "predict"]
     return prob_cols[-1] if prob_cols else None
 
-
+# Method to compute shap
 def _compute_shap_for_instance(mojo_model, length_val: int, entropy_val: float, out_png: Path):
     """Returns (shap_values_row, expected_value). Also writes a force plot PNG."""
     train_csv = Path(__file__).parent / "dga_dataset_train.csv"
@@ -82,7 +89,7 @@ def _compute_shap_for_instance(mojo_model, length_val: int, entropy_val: float, 
 
     return shap_row, expected
 
-
+# Method to format strength of prediction
 def _format_strength(abs_contrib: float, total_abs: float) -> str:
     if total_abs == 0:
         return "neutral"
@@ -93,7 +100,7 @@ def _format_strength(abs_contrib: float, total_abs: float) -> str:
         return "moderately"
     return "slightly"
 
-
+# Method to build explainable AI findings
 def _build_xai_findings(domain: str,
                         label: str,
                         prob_dga: float,
@@ -124,7 +131,7 @@ def _build_xai_findings(domain: str,
 
     return "\n".join(lines)
 
-
+# Method to generate playbook with Gemini
 async def generate_playbook_with_gemini(xai_findings: str) -> str:
     """
     Calls Gemini with xai_findings and returns a short numbered playbook.
@@ -166,12 +173,10 @@ async def generate_playbook_with_gemini(xai_findings: str) -> str:
             except Exception:
                 return "Error: Unexpected Gemini response: " + str(result)
 
-
+# Main method
 def main():
     parser = argparse.ArgumentParser(description="Analyze a domain, explain with SHAP, and generate a T1 playbook.")
     parser.add_argument("--domain", required=True, help="Domain to analyze (e.g., example.com)")
-    parser.add_argument("--always-generate", action="store_true",
-                        help="Generate a playbook even if prediction is 'legit'.")
     args = parser.parse_args()
 
     domain = args.domain.strip()
@@ -233,7 +238,7 @@ def main():
             print(playbook, "\n")
             print(f"Playbook saved to: {out_playbook}\n")
         else:
-            print("Prediction is 'legit' and --always-generate not set; skipping GenAI playbook.\n")
+            print("Prediction is 'legit', skipping GenAI playbook.\n")
 
     finally:
         h2o.cluster().shutdown(prompt=False)
