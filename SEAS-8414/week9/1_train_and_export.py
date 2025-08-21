@@ -1,8 +1,10 @@
 # Filename: 1_generate_dga_data.py
 import csv
-import random
-import math
 import h2o
+import math
+import os
+import random
+import shutil
 from h2o.automl import H2OAutoML
 
 
@@ -54,7 +56,6 @@ best_model = aml.leader
 
 # Download the MOJO artifact and save as DGA_Leader.zip
 mojo_path = best_model.download_mojo(path="./models/", get_genmodel_jar=False)
-import os, shutil
 final_path = os.path.join("./models", "DGA_Leader.zip")
 shutil.move(mojo_path, final_path)
 
