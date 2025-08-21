@@ -19,11 +19,11 @@ header = ['domain', 'length', 'entropy', 'class']
 data = []
 # Legitimate domains
 legit_domains = ['google', 'facebook', 'amazon', 'github', 'wikipedia', 'microsoft']
-for _ in range(100):
+for _ in range(250):
     domain = random.choice(legit_domains) + ".com"
     data.append([domain, len(domain), get_entropy(domain), 'legit'])
 # DGA domains
-for _ in range(100):
+for _ in range(250):
     length = random.randint(15, 25)
     domain = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz0123456789') for _ in range(length)) + ".com"
     data.append([domain, len(domain), get_entropy(domain), 'dga'])
@@ -52,7 +52,11 @@ print(aml.leaderboard.head())
 # Get the best performing model from the leaderboard
 best_model = aml.leader
 
-# Download the MOJO artifact.
-mojo_path = best_model.download_mojo(path="./models/")
-print(f"Production-ready model saved to: {mojo_path}")
-h2o.shutdown()
+# Download the MOJO artifact and save as DGA_Leader.zip
+mojo_path = best_model.download_mojo(path="./models/", get_genmodel_jar=False)
+import os, shutil
+final_path = os.path.join("./models", "DGA_Leader.zip")
+shutil.move(mojo_path, final_path)
+
+print(f"Production-ready model saved to: {final_path}")
+h2o.cluster().shutdown()
