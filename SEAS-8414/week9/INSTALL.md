@@ -10,6 +10,6 @@ This project uses Python 3.11. Please follow these steps to create a virtual env
 6. Create a ```.env``` file in the project root with your Gemini API key in the following format:
 ```GEMINI_API_KEY=<YOUR_API_KEY_HERE>```
 
-This concludes the installation instructions. You are now ready to run the program using the syntax:
+This concludes the installation instructions. You are now ready to generate the dataset using the syntax:
 
-```python3.11 2_analyze_domain.py --domain google.com```
+```python3.11 1_train_and_export.py```
